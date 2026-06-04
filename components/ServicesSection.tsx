@@ -70,8 +70,13 @@ export default function ServicesSection() {
               <Link
                 key={service.title}
                 href={`/services/${service.slug}`}
-                className="reveal-up glass-card rounded-sm p-6 md:p-8 relative overflow-hidden group transition-all duration-500"
-                style={{ transitionDelay: `${i * 80}ms` }}
+                className="reveal-up rounded-sm p-6 md:p-8 relative overflow-hidden group transition-all duration-500 border border-[rgba(201,168,76,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                style={{
+                  transitionDelay: `${i * 80}ms`,
+                  background: `linear-gradient(rgba(5,10,8,0.65), rgba(5,10,8,0.65)), url(/images/general/img${i + 1}.png)`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
               >
                 {/* Top-right tag */}
                 <div className="absolute top-4 right-4">
@@ -107,20 +112,20 @@ export default function ServicesSection() {
                   {service.title}
                 </h3>
                 <p
-                  className="text-white/50 font-body text-sm leading-relaxed"
+                  className="text-white/70 font-body text-sm leading-relaxed"
                   style={{ fontWeight: 300 }}
                 >
                   {service.desc}
                 </p>
 
                 {/* Hover arrow */}
-                <div className="mt-6 flex items-center gap-2 text-[#c9a84c] text-xs tracking-widest uppercase font-body opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="mt-6 flex items-center gap-2 text-[#c9a84c] text-xs tracking-widest uppercase font-body invisible group-hover:visible transition-all">
                   <span>Learn More</span>
                   <ArrowRight size={12} />
                 </div>
 
                 {/* Bottom glow on hover */}
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a84c] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a84c] to-transparent invisible group-hover:visible transition-all" />
               </Link>
             );
           })}

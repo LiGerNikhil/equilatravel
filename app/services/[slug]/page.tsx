@@ -30,6 +30,8 @@ export default function ServiceDetailPage({
   const service = getServiceBySlug(params.slug);
   if (!service) return notFound();
 
+  const imgIndex = services.findIndex((s) => s.slug === params.slug) + 1;
+
   return (
     <main className="pt-20">
       <div
@@ -39,6 +41,14 @@ export default function ServiceDetailPage({
             "linear-gradient(135deg, #050a08 0%, #071510 50%, #050a08 100%)",
         }}
       >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `linear-gradient(rgba(5,10,8,0.7), rgba(5,10,8,0.7)), url(/images/general/img${imgIndex}.png)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
