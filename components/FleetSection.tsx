@@ -60,6 +60,17 @@ const fleet = [
     price: "₹22/km",
     tagline: "The best in class",
   },
+  {
+    name: "Traveller Vehicle",
+    desc: "Premium traveller vehicles with top-tier amenities for long route travel with your family and friends.",
+    capacity: "12 Passengers",
+    badge: "Traveller",
+    image: "/images/cars/traveller.png",
+    features: ["AC", "WiFi", "Leather Seats", "Refreshments", "Chauffeur"],
+    rating: 5.0,
+    price: "₹12/km",
+    tagline: "The best in class",
+  },
 ];
 
 export default function FleetSection() {

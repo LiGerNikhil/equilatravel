@@ -7,7 +7,9 @@ import {
   MapPin,
   Send,
   CheckCircle,
+  X,
 } from "lucide-react";
+import { createLead } from "@/lib/api";
 
 const serviceTypes = [
   "City Ride",
@@ -39,17 +41,32 @@ export default function ContactForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const [errorMsg, setErrorMsg] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg("");
 
-    const message = `Hello Equila Travel Team,%0A%0AI would like to request a booking.%0A%0AName: ${form.name}%0APhone: ${form.phone}%0AEmail: ${form.email}%0AService: ${form.service}%0APickup: ${form.pickup}%0ADestination: ${form.destination}%0ATravel Date: ${form.date}%0AAdditional Notes: ${form.message}%0A%0APlease share availability, pricing, and next steps. Thank you!`;
-
-    const url = `https://wa.me/918796770014?text=${message}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    try {
+      await createLead({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        service: form.service,
+        pickup: form.pickup,
+        destination: form.destination,
+        date: form.date,
+        message: form.message,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setErrorMsg(
+        err instanceof Error ? err.message : "Something went wrong. Please try again.",
+      );
+    }
 
     setLoading(false);
-    setSubmitted(true);
   };
 
   const inputClass = `
@@ -60,6 +77,7 @@ export default function ContactForm() {
   `;
 
   return (
+    <>
     <section className="py-16 md:py-24" style={{ background: "#050a08" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -167,194 +185,225 @@ export default function ContactForm() {
 
           {/* Right: Booking form */}
           <div>
-            {submitted ? (
-              <div className="glass-card rounded-sm p-10 text-center">
-                <div
-                  className="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-full"
-                  style={{
-                    background: "rgba(201,168,76,0.1)",
-                    border: "1px solid rgba(201,168,76,0.4)",
-                  }}
-                >
-                  <CheckCircle size={36} className="text-[#c9a84c]" />
-                </div>
-                <h3 className="font-display text-2xl text-white mb-3">
-                  Booking <span className="gold-shimmer">Received!</span>
-                </h3>
-                <p className="text-white/50 font-body text-sm leading-relaxed mb-6">
-                  Thank you! Our team will contact you within 15 minutes to
-                  confirm your ride details.
-                </p>
-                <button
-                  onClick={() => {
-                    setSubmitted(false);
-                    setForm({
-                      name: "",
-                      phone: "",
-                      email: "",
-                      service: "",
-                      pickup: "",
-                      destination: "",
-                      date: "",
-                      message: "",
-                    });
-                  }}
-                  className="btn-outline-gold rounded-sm text-xs"
-                >
-                  Book Another Ride
-                </button>
-              </div>
-            ) : (
-              <div className="glass-card rounded-sm p-6 md:p-8">
-                <h3 className="font-display text-xl text-white mb-6">
-                  Quick <span className="gold-shimmer">Booking Form</span>
-                </h3>
+            <div className="glass-card rounded-sm p-6 md:p-8">
+              <h3 className="font-display text-xl text-white mb-6">
+                Quick <span className="gold-shimmer">Booking Form</span>
+              </h3>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="Your name"
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                        Phone *
-                      </label>
-                      <input
-                        name="phone"
-                        type="tel"
-                        value={form.phone}
-                        onChange={handleChange}
-                        required
-                        placeholder="+91 XXXXX XXXXX"
-                        className={inputClass}
-                      />
-                    </div>
-                  </div>
-
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                      Email
+                      Full Name *
                     </label>
                     <input
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="your@email.com"
-                      className={inputClass}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                      Service Type *
-                    </label>
-                    <select
-                      name="service"
-                      value={form.service}
+                      name="name"
+                      value={form.name}
                       onChange={handleChange}
                       required
+                      placeholder="Your name"
                       className={inputClass}
-                      style={{ background: "#071510" }}
-                    >
-                      <option value="">Select a service</option>
-                      {serviceTypes.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                        Pickup Location *
-                      </label>
-                      <input
-                        name="pickup"
-                        value={form.pickup}
-                        onChange={handleChange}
-                        required
-                        placeholder="Pickup address"
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                        Destination
-                      </label>
-                      <input
-                        name="destination"
-                        value={form.destination}
-                        onChange={handleChange}
-                        placeholder="Drop location"
-                        className={inputClass}
-                      />
-                    </div>
-                  </div>
-
                   <div>
                     <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                      Travel Date
+                      Phone *
                     </label>
                     <input
-                      name="date"
-                      type="date"
-                      value={form.date}
+                      name="phone"
+                      type="tel"
+                      value={form.phone}
                       onChange={handleChange}
+                      required
+                      placeholder="+91 XXXXX XXXXX"
                       className={inputClass}
-                      style={{ colorScheme: "dark" }}
                     />
                   </div>
+                </div>
 
+                <div>
+                  <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="your@email.com"
+                    className={inputClass}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
+                    Service Type *
+                  </label>
+                  <select
+                    name="service"
+                    value={form.service}
+                    onChange={handleChange}
+                    required
+                    className={inputClass}
+                    style={{ background: "#071510" }}
+                  >
+                    <option value="">Select a service</option>
+                    {serviceTypes.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
-                      Additional Notes
+                      Pickup Location *
                     </label>
-                    <textarea
-                      name="message"
-                      value={form.message}
+                    <input
+                      name="pickup"
+                      value={form.pickup}
                       onChange={handleChange}
-                      rows={3}
-                      placeholder="Any special requirements..."
-                      className={inputClass + " resize-none"}
+                      required
+                      placeholder="Pickup address"
+                      className={inputClass}
                     />
                   </div>
+                  <div>
+                    <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
+                      Destination
+                    </label>
+                    <input
+                      name="destination"
+                      value={form.destination}
+                      onChange={handleChange}
+                      placeholder="Drop location"
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn-gold rounded-sm w-full justify-center"
-                  >
-                    {loading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-[#050a08] border-t-transparent rounded-full animate-spin" />
-                        <span>Sending...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send size={16} />
-                        <span>Send Booking Request</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              </div>
-            )}
+                <div>
+                  <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
+                    Travel Date
+                  </label>
+                  <input
+                    name="date"
+                    type="date"
+                    value={form.date}
+                    onChange={handleChange}
+                    className={inputClass}
+                    style={{ colorScheme: "dark" }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] text-white/30 tracking-widest uppercase font-body mb-2">
+                    Additional Notes
+                  </label>
+                  <textarea
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    rows={3}
+                    placeholder="Any special requirements..."
+                    className={inputClass + " resize-none"}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-gold rounded-sm w-full justify-center"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-[#050a08] border-t-transparent rounded-full animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      <span>Send Booking Request</span>
+                    </>
+                  )}
+                </button>
+                {errorMsg && (
+                  <p className="text-red-400 font-body text-xs text-center mt-2">{errorMsg}</p>
+                )}
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </section>
+
+    {/* Success modal */}
+    {submitted && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6">
+        <div
+          className="relative w-full max-w-md rounded-2xl border border-[rgba(201,168,76,0.2)] p-8 text-center shadow-2xl shadow-black/60"
+          style={{ background: "#071510" }}
+        >
+          <button
+            onClick={() => {
+              setSubmitted(false);
+              setForm({
+                name: "",
+                phone: "",
+                email: "",
+                service: "",
+                pickup: "",
+                destination: "",
+                date: "",
+                message: "",
+              });
+            }}
+            className="absolute right-4 top-4 text-white/40 hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+
+          <div
+            className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full"
+            style={{
+              background: "rgba(201,168,76,0.1)",
+              border: "1px solid rgba(201,168,76,0.4)",
+            }}
+          >
+            <CheckCircle size={36} className="text-[#c9a84c]" />
+          </div>
+
+          <h3 className="font-display text-2xl text-white mb-3">
+            Booking <span className="gold-shimmer">Received!</span>
+          </h3>
+
+          <p className="text-white/60 font-body text-sm leading-relaxed mb-6">
+            Thank you for reaching out! Our team will contact you shortly.
+          </p>
+
+          <button
+            onClick={() => {
+              setSubmitted(false);
+              setForm({
+                name: "",
+                phone: "",
+                email: "",
+                service: "",
+                pickup: "",
+                destination: "",
+                date: "",
+                message: "",
+              });
+            }}
+            className="btn-gold rounded-sm text-sm w-full sm:w-auto px-8"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

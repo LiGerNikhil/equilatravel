@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Phone, MessageCircle } from "lucide-react";
+import { Menu, X, Phone, MessageCircle, Lock } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -11,6 +11,8 @@ const navLinks = [
   { label: "Services", href: "/services" },
   { label: "Fleet", href: "/fleet" },
   { label: "Contact", href: "/contact" },
+  // Admin login link (visible in header and mobile menu)
+  { label: "Admin", href: "/admin/login" },
 ];
 
 export default function Navbar() {
@@ -55,19 +57,30 @@ export default function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`animate-underline text-base font-body tracking-widest uppercase transition-colors duration-300 ${
-                    pathname === link.href
-                      ? "text-[#c9a84c]"
-                      : "text-white/80 hover:text-white"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) =>
+                link.label === "Admin" ? (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-1.5 text-base font-body tracking-widest uppercase text-red-400 hover:text-red-300 transition-colors duration-300"
+                  >
+                    <Lock size={14} />
+                    {link.label}
+                  </Link>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`animate-underline text-base font-body tracking-widest uppercase transition-colors duration-300 ${
+                      pathname === link.href
+                        ? "text-[#c9a84c]"
+                        : "text-white/80 hover:text-white"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ),
+              )}
             </div>
 
             {/* CTA */}
@@ -130,33 +143,35 @@ export default function Navbar() {
         {/* Gold ornament top */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c9a84c] to-transparent" />
 
-        <div className="flex flex-col items-center justify-center h-full gap-2 px-6">
-        
-          {/* <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 w-40 h-40 relative overflow-hidden">
-              <Image
-                src="/images/logo/logo.png"
-                alt="Equila Travel logo"
-                fill
-                className="object-contain"
-              />
-            </div>
-          </div> */}
-
-          {navLinks.map((link, i) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`w-full text-center py-4 font-display text-2xl font-medium border-b border-[rgba(201,168,76,0.1)] transition-colors duration-300 ${
-                pathname === link.href
-                  ? "text-[#c9a84c]"
-                  : "text-white/80 hover:text-[#c9a84c]"
-              }`}
-              style={{ transitionDelay: `${i * 60}ms` }}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="flex flex-col items-center h-full gap-2 px-6 pt-24 pb-8 overflow-y-auto">
+          {navLinks.map((link, i) =>
+            link.label === "Admin" ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="w-full text-center py-4 font-display text-2xl font-medium border-b border-[rgba(201,168,76,0.1)] text-red-400 hover:text-red-300 transition-colors duration-300 flex items-center justify-center gap-2"
+                style={{ transitionDelay: `${i * 60}ms` }}
+                onClick={() => setOpen(false)}
+              >
+                <Lock size={18} />
+                {link.label}
+              </Link>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`w-full text-center py-4 font-display text-2xl font-medium border-b border-[rgba(201,168,76,0.1)] transition-colors duration-300 ${
+                  pathname === link.href
+                    ? "text-[#c9a84c]"
+                    : "text-white/80 hover:text-[#c9a84c]"
+                }`}
+                style={{ transitionDelay: `${i * 60}ms` }}
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ),
+          )}
 
           <div className="mt-8 flex flex-col gap-3 w-full">
             <a href="tel:+918796770014" className="btn-outline-gold">

@@ -43,11 +43,11 @@ export default function VideoExperienceSection() {
         </div>
 
         <div className="mx-auto max-w-5xl px-4 sm:px-0">
-          <div className="relative rounded-[36px] border border-white/10 bg-black/35 shadow-[0_30px_90px_rgba(0,0,0,0.4)] overflow-hidden pb-24 md:pb-0">
+          <div className="relative rounded-[24px] sm:rounded-[36px] border border-white/10 bg-black/35 shadow-[0_30px_90px_rgba(0,0,0,0.4)] overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 pointer-events-none" />
-            <div className="relative overflow-hidden rounded-[34px] border border-white/5 bg-[#050a08]">
+            <div className="relative overflow-hidden rounded-[22px] sm:rounded-[34px] border border-white/5 bg-[#050a08]">
               <video
-                className="w-full h-full object-cover aspect-[16/9]"
+                className="w-full h-full object-cover aspect-[16/9] max-h-[80vh]"
                 src="/videos/video-2.mp4"
                 autoPlay
                 muted
@@ -55,10 +55,6 @@ export default function VideoExperienceSection() {
                 playsInline
               />
             </div>
-            {/* <div className="absolute md:-bottom-6 bottom-0 left-1/2 -translate-x-1/2 w-[90%] md:w-[88%] rounded-[32px] border border-white/10 bg-[#050a08]/40 backdrop-blur-xl px-5 py-4 text-white/70 text-sm md:text-base text-center shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
-              Watch the luxury travel preview with premium frame styling and
-              elegant ambient depth.
-            </div> */}
           </div>
         </div>
       </div>
