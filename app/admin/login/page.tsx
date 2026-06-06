@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const ADMIN_EMAIL = "info@equilatravel.com";
-const ADMIN_PASSWORD = "Kamit07@SD";
 const SESSION_KEY = "equila_admin_session";
 
 export default function AdminLoginPage() {
@@ -16,24 +14,48 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (localStorage.getItem(SESSION_KEY)) {
-      router.replace("/admin");
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) {
+      try {
+        const session = JSON.parse(raw);
+        if (session?.id && session?.role === "admin") {
+          router.replace("/admin");
+        }
+      } catch {
+        localStorage.removeItem(SESSION_KEY);
+      }
     }
   }, [router]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setLoading(true);
 
-    if (email.trim() === ADMIN_EMAIL && password.trim() === ADMIN_PASSWORD) {
-      localStorage.setItem(SESSION_KEY, "1");
-      router.push("/admin");
-      return;
-    }
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
 
-    setError("Invalid credentials. Please try again.");
-    setLoading(false);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Login failed.");
+      }
+
+      if (data.session?.role !== "admin") {
+        throw new Error("Unauthorized. Admin access only.");
+      }
+
+      localStorage.setItem(SESSION_KEY, JSON.stringify(data.session));
+      router.push("/admin");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

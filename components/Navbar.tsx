@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Phone, MessageCircle, Lock } from "lucide-react";
+import { Menu, X, Phone, MessageCircle, Lock, UserPlus } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -11,7 +11,7 @@ const navLinks = [
   { label: "Services", href: "/services" },
   { label: "Fleet", href: "/fleet" },
   { label: "Contact", href: "/contact" },
-  // Admin login link (visible in header and mobile menu)
+  { label: "Partner", href: "/vendor/register" },
   { label: "Admin", href: "/admin/login" },
 ];
 
@@ -58,7 +58,16 @@ export default function Navbar() {
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
               {navLinks.map((link) =>
-                link.label === "Admin" ? (
+                link.label === "Partner" ? (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-1.5 text-base font-body tracking-widest uppercase text-gold-500 hover:text-gold-400 transition-colors duration-300"
+                  >
+                    <UserPlus size={14} />
+                    {link.label}
+                  </Link>
+                ) : link.label === "Admin" ? (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -85,13 +94,13 @@ export default function Navbar() {
 
             {/* CTA */}
             <div className="hidden md:flex items-center gap-4">
-              <a
+              {/* <a
                 href="tel:+918796770014"
                 className="flex items-center gap-2 text-base text-[#c9a84c] font-body font-semibold tracking-wide hover:text-[#f5e6b8] transition-colors"
               >
                 <Phone size={16} />
                 +91 87967 70014
-              </a>
+              </a> */}
               <Link href="/contact" className="btn-gold text-sm px-6 py-3">
                 Book Now
               </Link>
@@ -145,7 +154,18 @@ export default function Navbar() {
 
         <div className="flex flex-col items-center h-full gap-2 px-6 pt-24 pb-8 overflow-y-auto">
           {navLinks.map((link, i) =>
-            link.label === "Admin" ? (
+            link.label === "Partner" ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="w-full text-center py-4 font-display text-2xl font-medium border-b border-[rgba(201,168,76,0.1)] text-gold-500 hover:text-gold-400 transition-colors duration-300 flex items-center justify-center gap-2"
+                style={{ transitionDelay: `${i * 60}ms` }}
+                onClick={() => setOpen(false)}
+              >
+                <UserPlus size={18} />
+                {link.label}
+              </Link>
+            ) : link.label === "Admin" ? (
               <Link
                 key={link.href}
                 href={link.href}

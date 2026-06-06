@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { LayoutDashboard, Users, Car } from "lucide-react";
+
 type AdminSidebarProps = {
   activeSection: "dashboard" | "leads";
   onNavigate: (section: "dashboard" | "leads") => void;
@@ -9,6 +12,11 @@ type AdminSidebarProps = {
 const navItems = [
   { label: "Dashboard", section: "dashboard" as const },
   { label: "Leads", section: "leads" as const },
+];
+
+const externalLinks = [
+  { label: "Vendors", href: "/admin/dashboard", icon: Users },
+  { label: "Cars", href: "/admin/dashboard", icon: Car },
 ];
 
 export default function AdminSidebar({
@@ -45,7 +53,28 @@ export default function AdminSidebar({
         })}
       </nav>
 
-      <div className="mt-10 border-t border-white/10 pt-6">
+      <div className="mt-6 border-t border-white/10 pt-6">
+        <p className="mb-3 text-[11px] uppercase tracking-[0.35em] text-white/30">
+          Management
+        </p>
+        <div className="space-y-2">
+          {externalLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+              >
+                <Icon size={16} className="text-gold-500" />
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-6 border-t border-white/10 pt-6">
         <button
           type="button"
           onClick={onLogout}

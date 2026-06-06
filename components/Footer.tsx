@@ -18,6 +18,9 @@ const quickLinks = [
   { label: "Contact Us", href: "/contact" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms & Conditions", href: "/terms" },
+  { label: "Become a Partner", href: "/vendor/register" },
+  { label: "Vendor Login", href: "/vendor/login" },
+  { label: "Admin", href: "/admin/login" },
 ];
 
 export default function Footer() {

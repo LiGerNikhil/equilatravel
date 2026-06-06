@@ -48,9 +48,9 @@ export default function HeroSection() {
         background: 'linear-gradient(135deg, #050a08 0%, #071510 50%, #050a08 100%)',
       }}
     >
-      {/* Background video - exact, no opacity/filter */}
+      {/* Background video - full visible on mobile, cover on desktop */}
       <video
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-contain md:object-cover"
         src="/videos/video1.mp4"
         autoPlay
         muted

@@ -9,7 +9,7 @@ import {
   CheckCircle,
   X,
 } from "lucide-react";
-import { createLead } from "@/lib/api";
+import { submitEnquiry } from "@/lib/api";
 
 const serviceTypes = [
   "City Ride",
@@ -49,7 +49,7 @@ export default function ContactForm() {
     setErrorMsg("");
 
     try {
-      await createLead({
+      await submitEnquiry({
         name: form.name,
         phone: form.phone,
         email: form.email,
