@@ -1,37 +1,47 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Car from '@/models/Car';
+import User from '@/models/User';
 
 export async function GET() {
   try {
     await connectDB();
 
-    const cars = await Car.aggregate([
-      { $match: { isAvailable: true } },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'vendorId',
-          foreignField: '_id',
-          as: 'vendor',
-        },
-      },
-      { $unwind: '$vendor' },
-      { $match: { 'vendor.status': 'active' } },
-      { $sort: { createdAt: -1 } },
-      {
-        $project: {
-          carName: 1,
-          vehicleNumber: 1,
-          pricePerKM: 1,
-          isAvailable: 1,
-          images: 1,
-          features: 1,
-          vendorName: '$vendor.name',
-          vendorEmail: '$vendor.email',
-        },
-      },
-    ]);
+    const availableCars = await Car.find({ isAvailable: true })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (availableCars.length === 0) {
+      return NextResponse.json([], { status: 200 });
+    }
+
+    const vendorIds = [...new Set(availableCars.map((c) => c.vendorId))];
+
+    const activeVendors = await User.find({
+      _id: { $in: vendorIds },
+      role: 'vendor',
+      status: 'active',
+    })
+      .select('name email')
+      .lean();
+
+    const activeVendorMap = new Map(
+      activeVendors.map((v) => [v._id.toString(), v]),
+    );
+
+    const cars = availableCars
+      .filter((c) => activeVendorMap.has(c.vendorId.toString()))
+      .map((c) => ({
+        _id: c._id,
+        carName: c.carName,
+        vehicleNumber: c.vehicleNumber,
+        pricePerKM: c.pricePerKM,
+        isAvailable: c.isAvailable,
+        images: c.images,
+        features: c.features,
+        vendorName: activeVendorMap.get(c.vendorId.toString())!.name,
+        vendorEmail: activeVendorMap.get(c.vendorId.toString())!.email,
+      }));
 
     return NextResponse.json(cars, { status: 200 });
   } catch (error) {
