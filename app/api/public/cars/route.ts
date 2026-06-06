@@ -15,7 +15,7 @@ export async function GET() {
       return NextResponse.json([], { status: 200 });
     }
 
-    const vendorIds = [...new Set(availableCars.map((c) => c.vendorId))];
+    const vendorIds = Array.from(new Set(availableCars.map((c) => c.vendorId)));
 
     const activeVendors = await User.find({
       _id: { $in: vendorIds },
