@@ -18,6 +18,7 @@ export async function GET() {
       },
       { $unwind: '$vendor' },
       { $match: { 'vendor.status': 'active' } },
+      { $sort: { createdAt: -1 } },
       {
         $project: {
           carName: 1,
@@ -30,7 +31,6 @@ export async function GET() {
           vendorEmail: '$vendor.email',
         },
       },
-      { $sort: { createdAt: -1 } },
     ]);
 
     return NextResponse.json(cars, { status: 200 });
