@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
       try {
         const session = JSON.parse(raw);
         if (session?.id && session?.role === "admin") {
-          router.replace("/admin");
+          router.replace("/admin/dashboard");
         }
       } catch {
         localStorage.removeItem(SESSION_KEY);
@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
       }
 
       localStorage.setItem(SESSION_KEY, JSON.stringify(data.session));
-      router.push("/admin");
+      router.push("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed.");
     } finally {
@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <section className="min-h-screen bg-royal-900 px-4 py-16 sm:px-6 lg:px-8">
+    <section className="min-h-screen bg-royal-900 px-4 py-16 pt-24 md:pt-32 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-md rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/25 backdrop-blur-xl">
         <div className="mb-8 text-center">
           <p className="text-xs uppercase tracking-[0.35em] text-white/40">

@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
-import { Pencil, Trash2, X, Plus } from "lucide-react";
+import { Pencil, Trash2, X, Plus, FileText, CheckCircle, AlertCircle } from "lucide-react";
 
 const SESSION_KEY = "equila_vendor_session";
 
@@ -46,6 +47,7 @@ export default function VendorDashboardPage() {
   const [newFeature, setNewFeature] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [docVerified, setDocVerified] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -61,7 +63,9 @@ export default function VendorDashboardPage() {
         return;
       }
       setSession(s);
+      void verifySession(s.id);
       void fetchCars(s.id);
+      void checkDocStatus(s.id);
     } catch {
       localStorage.removeItem(SESSION_KEY);
       router.replace("/vendor/login");
@@ -86,6 +90,39 @@ export default function VendorDashboardPage() {
       showToast("error", err instanceof Error ? err.message : "Failed to load cars.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const verifySession = async (vendorId: string) => {
+    try {
+      const res = await fetch("/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: vendorId, role: "vendor" }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data?.error || "Session invalid");
+      }
+    } catch {
+      localStorage.removeItem(SESSION_KEY);
+      router.replace("/vendor/login");
+    }
+  };
+
+  const checkDocStatus = async (vendorId: string) => {
+    try {
+      const res = await fetch("/api/vendor/documents", {
+        headers: { "x-vendor-id": vendorId },
+        cache: "no-store",
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const fields = ["drivingLicense", "registrationCertificate", "insurance", "pollutionCertificate", "policeVerification"];
+      const allVerified = fields.every((f) => data[f]?.status === "verified");
+      setDocVerified(allVerified);
+    } catch {
+      /* silent */
     }
   };
 
@@ -260,6 +297,9 @@ export default function VendorDashboardPage() {
             </p>
           </div>
           <div className="flex gap-3">
+            <Link href="/vendor/documents" className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/80 transition hover:border-gold-500/50 hover:text-gold-500">
+              <FileText size={16} /> Documents
+            </Link>
             <button type="button" onClick={openAddForm} className="rounded-2xl bg-gold-500 px-5 py-3 text-sm font-semibold text-royal-900 transition hover:bg-gold-400">
               Add new car
             </button>
@@ -275,6 +315,33 @@ export default function VendorDashboardPage() {
             {toast.message}
           </div>
         ) : null}
+
+        {/* Document status banner */}
+        {session && docVerified === false && (
+          <div className="rounded-3xl border border-yellow-500/20 bg-yellow-500/5 p-5 shadow-xl shadow-black/20">
+            <div className="flex items-center gap-3">
+              <AlertCircle size={20} className="text-yellow-400 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-yellow-200">Documents not verified</p>
+                <p className="text-xs text-yellow-300/70 mt-1">You need to submit and get all documents verified by admin before you can add cars.</p>
+              </div>
+              <Link
+                href="/vendor/documents"
+                className="flex-shrink-0 rounded-xl bg-yellow-500/15 px-4 py-2 text-xs font-semibold text-yellow-200 transition hover:bg-yellow-500/25"
+              >
+                <FileText size={14} className="inline mr-1.5" />Upload Documents
+              </Link>
+            </div>
+          </div>
+        )}
+        {session && docVerified === true && (
+          <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-5 shadow-xl shadow-black/20">
+            <div className="flex items-center gap-3">
+              <CheckCircle size={20} className="text-emerald-400 flex-shrink-0" />
+              <p className="text-sm text-emerald-200">All documents verified. You can add cars to your fleet.</p>
+            </div>
+          </div>
+        )}
 
         {/* Metrics */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

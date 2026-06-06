@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import { sendVendorStatusEmail } from '@/lib/email';
 
 export async function GET() {
   try {
@@ -52,6 +53,12 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         { error: 'Vendor not found.' },
         { status: 404 }
+      );
+    }
+
+    if (status === 'active' || status === 'inactive') {
+      sendVendorStatusEmail({ to: vendor.email, name: vendor.name, status }).catch(
+        (err) => console.error('Vendor status email failed:', err)
       );
     }
 

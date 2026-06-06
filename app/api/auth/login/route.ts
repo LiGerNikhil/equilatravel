@@ -33,17 +33,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (
-      user.role === 'vendor' &&
-      (user.status === 'pending' || user.status === 'inactive')
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            'Your vendor account is currently inactive or pending admin approval.',
-        },
-        { status: 403 }
-      );
+    if (user.role === 'vendor') {
+      if (user.status === 'pending') {
+        return NextResponse.json(
+          { error: 'Your vendor account is pending admin approval. You will receive an email once approved.' },
+          { status: 403 }
+        );
+      }
+      if (user.status === 'inactive') {
+        return NextResponse.json(
+          { error: 'Your vendor account has been deactivated. Please contact support.' },
+          { status: 403 }
+        );
+      }
     }
 
     const sessionPayload = {

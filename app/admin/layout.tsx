@@ -1,13 +1,13 @@
-import type { ReactNode } from "react";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Equila Travel Admin",
+export const metadata: Metadata = {
+  title: {
+    template: "%s | Equila Travel Admin",
+    default: "Admin | Equila Travel",
+  },
+  robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-screen bg-royal-900 text-white pt-28 md:pt-32">
-      {children}
-    </div>
-  );
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

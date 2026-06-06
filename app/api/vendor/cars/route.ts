@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Car from '@/models/Car';
 import User from '@/models/User';
+import VendorDocument from '@/models/VendorDocument';
 
 async function getVendorFromRequest(request: NextRequest) {
   const vendorId = request.headers.get('x-vendor-id');
@@ -14,6 +15,16 @@ async function getVendorFromRequest(request: NextRequest) {
     return { error: 'Vendor not found or account is not active.', status: 403 };
   }
   return { vendor };
+}
+
+async function checkDocumentsVerified(vendorId: string) {
+  const doc = await VendorDocument.findOne({ vendorId });
+  if (!doc) return false;
+  const fields = ['drivingLicense', 'registrationCertificate', 'insurance', 'pollutionCertificate', 'policeVerification'] as const;
+  return fields.every((f) => {
+    const field = doc[f] as { status?: string; documentNumber?: string; files?: string[] } | undefined;
+    return field?.status === 'verified';
+  });
 }
 
 export async function GET(request: NextRequest) {
@@ -42,6 +53,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
+    const docsVerified = await checkDocumentsVerified(result.vendor._id.toString());
+    if (!docsVerified) {
+      return NextResponse.json(
+        { error: 'All documents must be verified by admin before you can add cars.' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { carName, vehicleNumber, pricePerKM } = body;
 
@@ -65,7 +84,7 @@ export async function POST(request: NextRequest) {
       carName: carName.trim(),
       vehicleNumber: vehicleNumber.trim(),
       pricePerKM: Number(pricePerKM),
-      isAvailable: false,
+      isAvailable: true,
       images: body.images || [],
       features: body.features || [],
     });
