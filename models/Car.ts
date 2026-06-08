@@ -8,6 +8,8 @@ export interface ICar extends Document {
   vehicleNumber: string;
   pricePerKM: number;
   isAvailable: boolean;
+  status: 'available' | 'booked' | 'assigned';
+  currentAssignmentId?: mongoose.Types.ObjectId;
   images: string[];
   features: string[];
   createdAt: Date;
@@ -42,6 +44,16 @@ const CarSchema: Schema<ICar> = new Schema(
     isAvailable: {
       type: Boolean,
       default: false,
+    },
+    status: {
+      type: String,
+      enum: ['available', 'booked', 'assigned'],
+      default: 'available',
+    },
+    currentAssignmentId: {
+      type: Schema.Types.ObjectId,
+      ref: 'CarAssignment',
+      default: null,
     },
     images: {
       type: [String],

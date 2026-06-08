@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Car from '@/models/Car';
+import CarAssignment, { ICarAssignment } from '@/models/CarAssignment';
 import User from '@/models/User';
 import VendorDocument from '@/models/VendorDocument';
 
@@ -34,9 +35,44 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: result.status });
     }
 
-    const cars = await Car.find({ vendorId: result.vendor._id }).sort({ createdAt: -1 });
+    const cars = await Car.find({ vendorId: result.vendor._id }).sort({ createdAt: -1 }).lean();
 
-    return NextResponse.json(cars, { status: 200 });
+    const assignedCarIds = cars
+      .filter((c) => c.currentAssignmentId)
+      .map((c) => c.currentAssignmentId!.toString());
+
+    const assignments = assignedCarIds.length > 0
+      ? await CarAssignment.find({
+          _id: { $in: assignedCarIds },
+          status: 'active',
+        })
+          .select('customerName startDate pickup destination')
+          .lean()
+      : [];
+
+    const assignmentMap = new Map<string, Record<string, unknown>>(assignments.map((a) => [a._id.toString(), a as unknown as Record<string, unknown>]));
+
+    const carsWithInfo = cars.map((car) => {
+      const assignment = car.currentAssignmentId
+        ? assignmentMap.get(car.currentAssignmentId.toString())
+        : null;
+      const a = assignment as Record<string, unknown> | undefined;
+      return {
+        ...car,
+        isBooked: car.status === 'assigned' || car.status === 'booked',
+        booking: a
+          ? {
+              customerName: (a.customerName as string) || '',
+              date: (a.startDate as string) || '',
+              pickup: (a.pickup as string) || '',
+              destination: (a.destination as string) || '',
+              status: car.status,
+            }
+          : null,
+      };
+    });
+
+    return NextResponse.json(carsWithInfo, { status: 200 });
   } catch (error) {
     console.error('Vendor cars GET error:', error);
     return NextResponse.json(
@@ -85,6 +121,7 @@ export async function POST(request: NextRequest) {
       vehicleNumber: vehicleNumber.trim(),
       pricePerKM: Number(pricePerKM),
       isAvailable: true,
+      status: 'available',
       images: body.images || [],
       features: body.features || [],
     });

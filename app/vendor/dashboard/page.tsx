@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Pencil, Trash2, X, Plus, FileText, CheckCircle, AlertCircle } from "lucide-react";
+import { Pencil, Trash2, X, Plus, FileText, CheckCircle, AlertCircle, Calendar, User, MapPin, ClipboardList } from "lucide-react";
 
 const SESSION_KEY = "equila_vendor_session";
 
@@ -14,8 +14,17 @@ type VendorCar = {
   vehicleNumber: string;
   pricePerKM: number;
   isAvailable: boolean;
+  status: 'available' | 'booked' | 'assigned';
   images: string[];
   features: string[];
+  isBooked?: boolean;
+  booking?: {
+    customerName: string;
+    date: string;
+    pickup: string;
+    destination: string;
+    status: string;
+  } | null;
 };
 
 type Session = {
@@ -203,7 +212,7 @@ export default function VendorDashboardPage() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || "Failed to update car");
-        setCars((prev) => prev.map((c) => (c._id === editingCar._id ? data.car : c)));
+        setCars((prev) => prev.map((c) => (c._id === editingCar._id ? { ...data.car, isBooked: c.isBooked, booking: c.booking } : c)));
         showToast("success", "Car updated successfully.");
       } else {
         const res = await fetch("/api/vendor/cars", {
@@ -282,7 +291,8 @@ export default function VendorDashboardPage() {
     router.push("/vendor/login");
   };
 
-  const activeCount = cars.filter((c) => c.isAvailable).length;
+  const activeCount = cars.filter((c) => c.status === 'available').length;
+  const bookedCount = cars.filter((c) => c.status === 'booked' || c.status === 'assigned').length;
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
@@ -299,6 +309,9 @@ export default function VendorDashboardPage() {
           <div className="flex gap-3">
             <Link href="/vendor/documents" className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/80 transition hover:border-gold-500/50 hover:text-gold-500">
               <FileText size={16} /> Documents
+            </Link>
+            <Link href="/vendor/assignments" className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/80 transition hover:border-gold-500/50 hover:text-gold-500">
+              <ClipboardList size={16} /> Bookings
             </Link>
             <button type="button" onClick={openAddForm} className="rounded-2xl bg-gold-500 px-5 py-3 text-sm font-semibold text-royal-900 transition hover:bg-gold-400">
               Add new car
@@ -354,8 +367,8 @@ export default function VendorDashboardPage() {
             <p className="mt-3 text-5xl font-display text-emerald-400">{loading ? "..." : activeCount}</p>
           </div>
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-black/20">
-            <p className="text-xs uppercase tracking-[0.35em] text-white/40">Unavailable</p>
-            <p className="mt-3 text-5xl font-display text-red-400">{loading ? "..." : cars.length - activeCount}</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-white/40">Booked</p>
+            <p className="mt-3 text-5xl font-display text-blue-400">{loading ? "..." : bookedCount}</p>
           </div>
         </div>
 
@@ -494,9 +507,13 @@ export default function VendorDashboardPage() {
                   ) : (
                     <div className="flex h-full items-center justify-center text-white/10 text-sm">No photo</div>
                   )}
-                  <span className={`absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-medium ${car.isAvailable ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"}`}>
-                    {car.isAvailable ? "Available" : "Unavailable"}
-                  </span>
+                  {car.status === 'assigned' ? (
+                    <span className="absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-500/15 text-blue-300">Assigned</span>
+                  ) : car.status === 'booked' ? (
+                    <span className="absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-500/15 text-red-300">Booked</span>
+                  ) : (
+                    <span className="absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-xs font-medium bg-emerald-500/15 text-emerald-300">Available</span>
+                  )}
                 </div>
 
                 {/* Info */}
@@ -520,15 +537,34 @@ export default function VendorDashboardPage() {
                   </div>
                 ) : null}
 
+                {/* Booking info */}
+                {car.isBooked && car.booking ? (
+                  <div className="mb-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-3">
+                    <p className="text-[11px] font-semibold text-blue-300 mb-2 flex items-center gap-1.5">
+                      <User size={11} /> Booked by {car.booking.customerName}
+                    </p>
+                    {car.booking.date ? (
+                      <p className="text-[10px] text-white/50 flex items-center gap-1.5 mb-1">
+                        <Calendar size={10} /> {car.booking.date}
+                      </p>
+                    ) : null}
+                    {car.booking.pickup || car.booking.destination ? (
+                      <p className="text-[10px] text-white/50 flex items-center gap-1.5">
+                        <MapPin size={10} /> {car.booking.pickup || '—'} → {car.booking.destination || '—'}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 {/* Toggle */}
                 <label className="mb-4 flex cursor-pointer items-center gap-3">
                   <div className="relative">
-                    <input type="checkbox" className="sr-only" checked={car.isAvailable} onChange={() => handleToggle(car._id)} />
-                    <div className={`h-7 w-12 rounded-full transition-colors ${car.isAvailable ? "bg-emerald-500" : "bg-white/20"}`}>
+                    <input type="checkbox" className="sr-only" checked={car.isAvailable} disabled={car.status !== 'available'} onChange={() => handleToggle(car._id)} />
+                    <div className={`h-7 w-12 rounded-full transition-colors ${car.status !== 'available' ? "bg-blue-500/40 cursor-not-allowed" : car.isAvailable ? "bg-emerald-500" : "bg-white/20"}`}>
                       <div className={`h-7 w-7 rounded-full bg-white shadow-md transition-transform ${car.isAvailable ? "translate-x-5" : "translate-x-0"}`} />
                     </div>
                   </div>
-                  <span className="text-sm text-white/60">{car.isAvailable ? "Active" : "Inactive"}</span>
+                  <span className="text-sm text-white/60">{car.status === 'assigned' ? "Assigned" : car.status === 'booked' ? "Booked" : car.isAvailable ? "Active" : "Inactive"}</span>
                 </label>
 
                 {/* Edit / Delete */}

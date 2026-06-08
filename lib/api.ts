@@ -8,6 +8,11 @@ export type Enquiry = {
   destination: string;
   date: string;
   message: string;
+  status: 'pending' | 'assigned' | 'completed';
+  assignedCarId?: string;
+  assignedCarName?: string;
+  assignedCarNumber?: string;
+  assignedCarPrice?: number;
   createdAt: string;
 };
 
@@ -103,8 +108,43 @@ export type VendorCar = {
   vehicleNumber: string;
   pricePerKM: number;
   isAvailable: boolean;
+  status: 'available' | 'booked' | 'assigned';
   images: string[];
   features: string[];
+  isBooked?: boolean;
+  booking?: {
+    customerName: string;
+    date: string;
+    pickup: string;
+    destination: string;
+    status: string;
+  } | null;
+};
+
+export type CarAssignment = {
+  _id: string;
+  carId: {
+    _id: string;
+    carName: string;
+    vehicleNumber: string;
+    pricePerKM: number;
+    images?: string[];
+  };
+  vendorId: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  assignedBy: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  startDate: string;
+  endDate?: string;
+  pickup?: string;
+  destination?: string;
+  status: 'active' | 'completed';
+  createdAt: string;
 };
 
 export async function fetchVendorCars(vendorId: string): Promise<VendorCar[]> {
@@ -187,4 +227,59 @@ export async function toggleCarAvailability(
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || "Failed to toggle availability");
   return data;
+}
+
+export async function fetchAdminAssignments(filters?: { carId?: string; vendorId?: string; status?: string }): Promise<CarAssignment[]> {
+  const raw = localStorage.getItem("equila_admin_session");
+  if (!raw) throw new Error("Not authenticated");
+  const session = JSON.parse(raw);
+  const params = new URLSearchParams();
+  if (filters?.carId) params.set('carId', filters.carId);
+  if (filters?.vendorId) params.set('vendorId', filters.vendorId);
+  if (filters?.status) params.set('status', filters.status);
+  const qs = params.toString();
+  const res = await fetch(`/api/admin/car-assignments${qs ? `?${qs}` : ''}`, {
+    headers: { "x-admin-id": session.id },
+    cache: "no-store",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || "Failed to fetch assignments");
+  return Array.isArray(data) ? data : [];
+}
+
+export async function createCarAssignment(payload: {
+  carId: string;
+  vendorId: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  startDate?: string;
+  endDate?: string;
+  pickup?: string;
+  destination?: string;
+}): Promise<unknown> {
+  const raw = localStorage.getItem("equila_admin_session");
+  if (!raw) throw new Error("Not authenticated");
+  const session = JSON.parse(raw);
+  const res = await fetch("/api/admin/car-assign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-admin-id": session.id },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || "Failed to assign car");
+  return data;
+}
+
+export async function fetchVendorAssignments(vendorId: string, status?: string): Promise<CarAssignment[]> {
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  const qs = params.toString();
+  const res = await fetch(`/api/vendor/car-assignments${qs ? `?${qs}` : ''}`, {
+    headers: { "x-vendor-id": vendorId },
+    cache: "no-store",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || "Failed to fetch assignments");
+  return Array.isArray(data) ? data : [];
 }

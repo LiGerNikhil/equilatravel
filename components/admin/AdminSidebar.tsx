@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, MessageSquare, Users, Car, FileText, LogOut, Menu, X, Lock, Eye, EyeOff } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Users, Car, FileText, ClipboardList, UserPlus, LogOut, Menu, X, Lock, Eye, EyeOff } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -11,6 +11,8 @@ const navItems = [
   { label: "Vendors", href: "/admin/vendors", icon: Users },
   { label: "Cars", href: "/admin/cars", icon: Car },
   { label: "Documents", href: "/admin/documents", icon: FileText },
+  { label: "Assign Car", href: "/admin/car-assign", icon: UserPlus },
+  { label: "Assignments", href: "/admin/car-assignments", icon: ClipboardList },
 ];
 
 export default function AdminSidebar() {
