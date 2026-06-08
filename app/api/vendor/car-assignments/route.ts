@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb';
 import CarAssignment from '@/models/CarAssignment';
 import User from '@/models/User';
 
+export const dynamic = 'force-dynamic';
+
 async function getVendorFromRequest(request: NextRequest) {
   const vendorId = request.headers.get('x-vendor-id');
   if (!vendorId) {

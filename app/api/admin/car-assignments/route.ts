@@ -3,6 +3,8 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import CarAssignment from '@/models/CarAssignment';
 
+export const dynamic = 'force-dynamic';
+
 async function getAdminFromRequest(request: NextRequest) {
   const adminId = request.headers.get('x-admin-id');
   if (!adminId) {

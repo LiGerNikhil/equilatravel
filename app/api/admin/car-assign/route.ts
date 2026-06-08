@@ -5,6 +5,8 @@ import User from '@/models/User';
 import CarAssignment from '@/models/CarAssignment';
 import { sendCarAssignedEmail } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+
 async function getAdminFromRequest(request: NextRequest) {
   const adminId = request.headers.get('x-admin-id');
   if (!adminId) {
