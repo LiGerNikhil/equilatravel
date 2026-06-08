@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact Us & Book a Ride",
+  title: "Contact Equila Travel — Book a Cab, Get a Quote, Call +91 87967 70014",
   description:
-    "Contact Equila Travel to book your premium cab. Call +91 87967 70014, WhatsApp, or fill our quick booking form. 24/7 support available.",
+    "Contact Equila Travel to book your premium cab. Call +91 87967 70014, reach us on WhatsApp, or fill our quick booking form. 24/7 customer support for all your travel needs.",
   alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact Equila Travel — Book a Cab, Get a Quote, Call +91 87967 70014",
+    description:
+      "Contact Equila Travel to book your premium cab. Call +91 87967 70014. 24/7 customer support.",
+  },
 };
 
 export default function ContactPage() {

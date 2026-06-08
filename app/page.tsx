@@ -8,11 +8,16 @@ import SafetyBookingTestimonials from "@/components/SafetyBookingTestimonials";
 import CTASection from "@/components/CTASection";
 
 export const metadata: Metadata = {
-  title: "Equila Travel — Premium Cab Services Across India",
+  title: "Equila Travel — Premium Cab Services Across India | Book Online",
   description:
-    "Book comfortable and affordable cab services with Equila Travel. City rides, airport transfers, outstation trips, and hourly rentals with professional drivers.",
+    "Book Equila Travel for premium cab services across India. City rides, airport transfers, outstation trips, hourly rentals — professional drivers, GPS-tracked vehicles, 24/7 support. Trusted cab booking service.",
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: "Equila Travel — Premium Cab Services Across India | Book Online",
+    description:
+      "Book Equila Travel for premium cab services — city rides, airport transfers, outstation trips, and hourly rentals across India.",
   },
 };
 

@@ -3,10 +3,15 @@ import AboutSection from '@/components/AboutSection';
 import CTASection from '@/components/CTASection';
 
 export const metadata: Metadata = {
-  title: 'About Us',
+  title: 'About Equila Travel — Premium Cab Service Company India',
   description:
-    'Learn about Equila Travel — our story, mission, and commitment to delivering premium cab services across India. A brand of Equila Solutions Pvt Ltd.',
+    'Learn about Equila Travel — our story, mission, and commitment to delivering premium cab services across India. Equila Travel is a brand of Equila Solutions Pvt Ltd, offering reliable city rides, airport transfers, and outstation trips.',
   alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About Equila Travel — Premium Cab Service Company India',
+    description:
+      'Learn about Equila Travel — premium cab services across India. City rides, airport transfers, outstation trips.',
+  },
 };
 
 export default function AboutPage() {

@@ -14,11 +14,16 @@ export function generateMetadata({
   params: { slug: string };
 }): Metadata {
   const service = getServiceBySlug(params.slug);
-  if (!service) return { title: "Service" };
+  if (!service) return { title: "Service Not Found | Equila Travel" };
 
   return {
-    title: `${service.title} | Equila Travel`,
-    description: service.desc,
+    title: `${service.title} | Equila Travel Cab Services`,
+    description: `Equila Travel ${service.title} — ${service.desc.substring(0, 155)}. Book online, professional drivers, GPS-tracked vehicles, 24/7 support.`,
+    alternates: { canonical: `/services/${params.slug}` },
+    openGraph: {
+      title: `${service.title} | Equila Travel Cab Services`,
+      description: `Equila Travel ${service.title} — ${service.desc.substring(0, 150)}.`,
+    },
   };
 }
 

@@ -3,10 +3,15 @@ import FleetSection from '@/components/FleetSection';
 import CTASection from '@/components/CTASection';
 
 export const metadata: Metadata = {
-  title: 'Our Fleet',
+  title: 'Equila Travel Fleet — Sedans, SUVs, Premium & Executive Cars',
   description:
-    'Explore the Equila Travel vehicle fleet — Sedans, SUVs, Premium Cars, Family Vehicles, and Executive Cars. All GPS-tracked and sanitized.',
+    'Explore the Equila Travel vehicle fleet — Sedans, SUVs, Premium Cars, Family Vehicles, and Executive Cars. All GPS-tracked, sanitized, and driven by professional chauffeurs. Book your ride today.',
   alternates: { canonical: '/fleet' },
+  openGraph: {
+    title: 'Equila Travel Fleet — Sedans, SUVs, Premium & Executive Cars',
+    description:
+      'Explore the Equila Travel vehicle fleet — Sedans, SUVs, Premium Cars, Family Vehicles, and Executive Cars.',
+  },
 };
 
 export default function FleetPage() {

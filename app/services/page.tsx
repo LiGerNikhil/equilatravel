@@ -4,10 +4,15 @@ import SafetyBookingTestimonials from "@/components/SafetyBookingTestimonials";
 import CTASection from "@/components/CTASection";
 
 export const metadata: Metadata = {
-  title: "Our Services",
+  title: "Cab Services by Equila Travel — City Rides, Airport Transfers & More",
   description:
-    "Equila Travel offers city rides, airport transfers, flight booking across all classes, visa assistance, outstation trips, hourly rentals, and corporate travel solutions.",
+    "Explore all services by Equila Travel — city cab rides, airport transfers, outstation trips, hourly rentals, flight booking, visa assistance, and corporate travel solutions. Book your ride today.",
   alternates: { canonical: "/services" },
+  openGraph: {
+    title: "Cab Services by Equila Travel — City Rides, Airport Transfers & More",
+    description:
+      "Explore all services by Equila Travel — city cab rides, airport transfers, outstation trips, hourly rentals, and more.",
+  },
 };
 
 export default function ServicesPage() {

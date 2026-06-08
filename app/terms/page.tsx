@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions",
-  description:
-    "Terms and conditions for Equila Travel services by Equila Solutions Pvt Ltd.",
+  title: "Terms and Conditions | Equila Travel",
+  description: "Terms and conditions for using Equila Travel cab booking services. Read our policies on bookings, cancellations, payments, and usage.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {
